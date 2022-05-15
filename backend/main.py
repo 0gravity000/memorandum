@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from flask_cors import CORS
 
 # instantiate the app
-app = Flask(__name__)
+app = Flask(__name__, static_folder='./dist/static', template_folder='./dist')
+#app = Flask(__name__)
 app.config.from_object(__name__)
 
 # enable CORS
@@ -36,6 +37,11 @@ def all_books():
 @app.route("/api/ping")
 def hello_world():
   return jsonify('pong!')
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>', methods=('GET', 'POST'))
+def index(path):
+  return render_template('index.html')
 
 if __name__ == '__main__':
   app.run()
