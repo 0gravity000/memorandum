@@ -44,12 +44,17 @@ def stroke_ahref():
   #logging.debug(res.content)
   soup = BeautifulSoup(res.content, "html.parser")
   #logging.debug(soup)
-  txt = soup.get_text()
+  #txt = soup.get_text()
   hrefs = []
+  allText = ""
+  #logging.debug(soup.find_all('a'))
   for link in soup.find_all('a'):
-      hrefs.append(link.get('href'))
+    #logging.debug(link)
+    #logging.debug(link.string)
+    hrefs.append({'href': link.get('href'), 'txt': link.string})
+  allText = soup.get_text("｜")
   #logging.debug(hrefs)
-  return jsonify(hrefs)
+  return jsonify(hrefs, allText)
 
 @app.route('/api/books', methods=['GET'])
 def all_books():

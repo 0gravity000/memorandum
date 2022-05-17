@@ -1,6 +1,6 @@
 <template>
   <div class="dom-experiment-01">
-    <h2>a要素を出力する</h2>
+    <h2>指定ページのa要素と全テキストを出力する</h2>
     <!-- 
     <form action="/api/stroke/ahref" method="post">
     -->
@@ -18,12 +18,31 @@
       <button type="submit" class="btn btn-primary">送信</button>
       -->
     </form>
-    <div v-for="element in elements" :key="element">
-      <a :href="targetProtocol + '//' + targetDomein + '/' + element" target="_blank" rel="noopener noreferrer">
-        {{this.targetProtocol}}//{{this.targetDomein}}/{{element}}
+
+    <hr>
+    <div>
+      <a href="#dom-experiment-01-result-a-tag">a要素の出力結果へ</a>
+    </div>
+    <div>
+      <a href="#dom-experiment-01-result-all-text">全テキストの出力結果へ</a>
+    </div>
+
+    <hr>
+    <h3 id="dom-experiment-01-result-a-tag">a要素</h3>
+    <div v-for="element in elements" :key="element" class="mt-3">
+      {{element.txt}}<br>
+      <a :href="targetProtocol + '//' + targetDomein + '/' + element.href" target="_blank" rel="noopener noreferrer">
+        {{targetProtocol}}//{{targetDomein}}/{{element.href}}
       </a>
     </div>
+
+    <hr>
+    <h3 id="dom-experiment-01-result-all-text">全テキスト</h3>
+    <div v-for="text in texts" :key="text">
+      {{text}}<br>
+    </div>
     <!-- 
+    <div>{{targetAllText}}</div>
     <div v-for="element in elements" :key="element">
       <a :href="element.href" target="_blank" rel="noopener noreferrer">{{element.innerHTML}}</a>
     </div>
@@ -42,11 +61,15 @@ export default {
       targetUrl: "https://developer.mozilla.org/ja/docs/Web/API",
       targetDomein: "",
       targetProtocol: "",
+      targetAllText: "",
       //targetSelector: "a",
       elements: [],
+      texts: [],
     }
   },
   mounted() {
+  },
+  computed: {
   },
   methods: {
     crawlTargetUrl: function(){
@@ -60,12 +83,17 @@ export default {
       })
       .then(function (res) {
         console.log(res.data)
-        self.elements = res.data
+        self.elements = res.data[0]
+        self.splitEachText(res.data[1])
+        //self.targetAllText = res.data[1]
       })
       .catch(function (err){
         console.log(err)
         self.elements = err.data
       })
+    },
+    splitEachText:  function(alltexts) {
+      this.texts = alltexts.split("｜")
     },
   },
 }
