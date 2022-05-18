@@ -3,6 +3,9 @@ import HomeView from '../views/HomeView.vue'
 import PingPage from '../components/PingPage.vue'
 import BooksPage from '../components/BooksPage.vue'
 import DOMExperiment01 from '../components/DOMExperiment01.vue'
+import BookmarksIndex from '../components/BookmarksIndex.vue'
+import BookmarksCreate from '../components/BookmarksCreate.vue'
+import BookmarksUpdate from '../components/BookmarksUpdate.vue'
 
 const routes = [
   {
@@ -14,6 +17,21 @@ const routes = [
     path: '/dom-experiment-01',
     name: 'dom-experiment-01',
     component: DOMExperiment01
+  },
+  {
+    path: '/bookmarks',
+    name: 'bookmarks-index',
+    component: BookmarksIndex
+  },
+  {
+    path: '/bookmarks/create',
+    name: 'bookmarks-create',
+    component: BookmarksCreate
+  },
+  {
+    path: '/bookmarks/:id',
+    name: 'bookmarks-update',
+    component: BookmarksUpdate
   },
   {
     path: '/about',
