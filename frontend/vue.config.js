@@ -8,4 +8,10 @@ module.exports = defineConfig({
     // localhostでvueからflaskにAPIリクエストを送信する為の設定
     proxy: 'http://localhost:5000'
   },
+  pages: {
+    index: {
+      entry: "src/main.js",
+      title: "MemoRandum",
+    }
+  },
 })
