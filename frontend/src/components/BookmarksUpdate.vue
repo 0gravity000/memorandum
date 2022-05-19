@@ -2,8 +2,8 @@
   <div class="bookmarks-update">
     <h2>ブックマーク編集</h2>
     <router-link to="/bookmarks">戻る</router-link>
-    {{ id }}
     <form>
+      <label class="form-label">{{ id }}</label>
       <div class="mb-3">
         <label class="form-label">タイトル</label>
         <input v-model="this.bookmarks.title" class="form-control" placeholder="タイトルを入力してください">

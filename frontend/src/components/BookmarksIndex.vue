@@ -4,17 +4,17 @@
     <router-link to="/bookmarks/create">ブックマーク登録</router-link>
     <!-- {{bookmarks}}<br> -->
     <div v-for="bookmark in bookmarks" :key="bookmark">
-      {{bookmark.id}}<br>
-      {{bookmark.title}}<br>
-      {{bookmark.url}}<br>
-      {{bookmark.remarks}}<br>
-      <span>
+      <div class="card me-3">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted fw-light">{{bookmark.id}}</h6>
+          <h5 class="card-title" data-bs-toggle="tooltip" :title="bookmark.remarks">{{bookmark.title}}</h5>
+          <a :href="bookmark.url" target="_blank" rel="noopener noreferrer">
+            <p class="card-text">{{bookmark.url}}</p>
+          </a>
         <router-link :to="{name: 'bookmarks-update', params: {id: bookmark.id}}">ブックマーク編集</router-link>&nbsp;
-        <button @click="deleteBookmarks(bookmark.id)">ブックマーク削除</button>
-        <!-- 
-        <a :href="deleteBookmarks(bookmark.id)">ブックマーク削除</a>
-         -->
-      </span>
+        <a href="" @click="deleteBookmarks(bookmark.id)">ブックマーク削除</a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -35,6 +35,9 @@ export default {
   computed: {
   },
   methods: {
+    confirmDelete() {
+      return confirm("ブックマークを削除します")
+    },    
     showBookmarks: function(){
       let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
       axios.get('/api/bookmarks')
@@ -48,16 +51,18 @@ export default {
       })
     },
     deleteBookmarks: function(id){
-      let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
-      axios.delete('/api/bookmarks/delete/' + id)
-      .then(function (res) {
-        console.log(res.data)
-        self.bookmarks = res.data
-      })
-      .catch(function (err){
-        console.log(err)
-        self.bookmarks = err.data
-      })
+      if (this.confirmDelete()) {
+        let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+        axios.delete('/api/bookmarks/delete/' + id)
+        .then(function (res) {
+          console.log(res.data)
+          self.bookmarks = res.data
+        })
+        .catch(function (err){
+          console.log(err)
+          self.bookmarks = err.data
+        })
+      }
     },
   },
 }
