@@ -45,17 +45,23 @@ BOOKS = [
 def bookmarks():
     if request.method == 'POST':
         logging.debug('now in post bookmarks')
+        json = request.get_json()
+        logging.debug(json)
         # The kind for the new entity
         kind = "Bookmark"
         # The name/ID for the new entity
         #name = "foo"
+        # 重複チェック
+        query = client.query(kind=kind)
+        result = list(query.add_filter('url', '=', json["url"]).fetch())
+        if result:
+            return "Already registered"
+
         # The Cloud Datastore key for the new entity
         bookmark_key = client.key(kind)
         #bookmark_key = client.key(kind, name)
         # Prepares the new entity
         bookmark = datastore.Entity(key=bookmark_key)
-        json = request.get_json()
-        logging.debug(json)
         bookmark["url"] = json["url"]
         bookmark["title"] = json["title"]
         bookmark["remarks"] = json["remarks"]
@@ -66,14 +72,14 @@ def bookmarks():
         client.put(bookmark)
         logging.debug('now leave post bookmarks')
         return bookmark
-    else:
+    else:   #GET method
         logging.debug('now in get bookmarks')
         # The kind for the new entity
         kind = "Bookmark"
         query = client.query(kind=kind)
         logging.debug(query)
         result = list(query.fetch())
-        logging.debug(result)
+        #logging.debug(result)
         if not result:
             logging.debug('now leave get bookmarks')
             return ""
@@ -81,9 +87,9 @@ def bookmarks():
         bookmarks = []
         for item in result:
             obj = dict(item)
-            logging.debug(obj)
+            #logging.debug(obj)
             obj["id"] = item.key.id
-            logging.debug(obj)
+            #logging.debug(obj)
             bookmarks.append(obj)
 
         logging.debug('now leave get bookmarks')
@@ -179,6 +185,22 @@ def delete_bookmark(targetid):
 
     logging.debug('now leave delete bookmarks')
     return jsonify(bookmarks)
+
+@app.route('/api/adjustBookmark', methods=['POST'])
+def adjust_bookmark():
+    json = request.get_json()
+    #logging.debug(json)
+    beforeBookmark = json["beforeBookmark"]
+    #logging.debug(beforeBookmark)
+    soup = BeautifulSoup(beforeBookmark, "html.parser")
+    # logging.debug(soup)
+    #txt = soup.get_text()
+    hrefs = []
+    # logging.debug(soup.find_all('a'))
+    for tag in soup.find_all(["a", "h3"]):
+        #logging.debug(tag)
+        hrefs.append({'name': tag.name, 'txt': tag.string, 'href': tag.get('href')})
+    return jsonify(hrefs)
 
 
 @app.route('/api/stroke/ahref', methods=['POST'])

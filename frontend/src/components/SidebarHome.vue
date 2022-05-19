@@ -7,6 +7,9 @@
       <li class="list-group-item">
         <router-link to="/bookmarks">ブックマーク一覧</router-link>
       </li>
+      <li class="list-group-item">
+        <router-link to="/bookmarks-import">Chromeブックマークインポート</router-link>
+      </li>
       <!--       
       <li class="list-group-item">
       <details>

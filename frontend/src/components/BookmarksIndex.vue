@@ -1,5 +1,5 @@
 <template>
-  <div class="bookmarks-Index">
+  <div class="bookmarks-index">
     <h2>ブックマーク一覧</h2>
     <router-link to="/bookmarks/create">ブックマーク登録</router-link>
     <!-- {{bookmarks}}<br> -->

@@ -6,6 +6,7 @@ import DOMExperiment01 from '../components/DOMExperiment01.vue'
 import BookmarksIndex from '../components/BookmarksIndex.vue'
 import BookmarksCreate from '../components/BookmarksCreate.vue'
 import BookmarksUpdate from '../components/BookmarksUpdate.vue'
+import BookmarksImport from '../components/BookmarksImport.vue'
 
 const routes = [
   {
@@ -32,6 +33,11 @@ const routes = [
     path: '/bookmarks/:id',
     name: 'bookmarks-update',
     component: BookmarksUpdate
+  },
+  {
+    path: '/bookmarks-import',
+    name: 'bookmarks-import',
+    component: BookmarksImport
   },
   {
     path: '/about',
