@@ -36,7 +36,7 @@ def bookmarks():
         bookmark["url"] = json["url"]
         bookmark["title"] = json["title"]
         bookmark["remarks"] = json["remarks"]
-        bookmark["importance"] = json["importance"]
+        bookmark["importance"] = int(json["importance"])
         bookmark["updated_at"] = datetime.utcnow()
         bookmark["created_at"] = datetime.utcnow()
         logging.debug(bookmark)
@@ -61,7 +61,8 @@ def bookmarks():
             obj = dict(item)
             #logging.debug(obj)
             obj["id"] = item.key.id
-            #logging.debug(obj)
+            #obj["importance"] = int(item.importance)
+            logging.debug(obj)
             bookmarks.append(obj)
 
         logging.debug('now leave get bookmarks')
@@ -102,7 +103,7 @@ def update_bookmark(targetid):
     result["url"] = json["url"]
     result["title"] = json["title"]
     result["remarks"] = json["remarks"]
-    result["importance"] = json["importance"]
+    result["importance"] = int(json["importance"])
     result["updated_at"] = datetime.utcnow()
     #result["created_at"] = datetime.utcnow()
     logging.debug(result)

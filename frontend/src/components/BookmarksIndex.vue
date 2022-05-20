@@ -6,7 +6,10 @@
     <div v-for="bookmark in bookmarks" :key="bookmark">
       <div class="card me-3">
         <div class="card-body">
+          <span v-for="i in bookmark.importance" :key="i">{{"★"}}</span>
+          <!-- 
           <h6 class="card-subtitle mb-2 text-muted fw-light">{{bookmark.id}}</h6>
+           -->
           <h5 class="card-title" data-bs-toggle="tooltip" :title="bookmark.remarks">{{bookmark.title}}</h5>
           <a :href="bookmark.url" target="_blank" rel="noopener noreferrer">
             <p class="card-text">{{bookmark.url}}</p>
