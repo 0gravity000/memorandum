@@ -2,7 +2,7 @@
   <div class="bookmarks-create">
     <h2>ブックマーク登録</h2>
     <router-link to="/bookmarks">戻る</router-link>
-    <form>
+    <form class=" me-5">
       <div class="mb-3">
         <label class="form-label">タイトル</label>
         <input v-model="this.title" class="form-control" placeholder="タイトルを入力してください">
@@ -10,6 +10,20 @@
       <div class="mb-3">
         <label class="form-label">URL</label>
         <input v-model="this.url" class="form-control" placeholder="URLを入力してください">
+      </div>
+      <div class="mb-3 col-6">
+        <label class="form-label">重要度</label>
+        <div class="row">
+          <div class="col">
+            <label class="form-label">低</label>
+          </div>
+          <div class="col range-label-end">
+            <label class="form-label">高</label>
+          </div>
+        </div>
+        <div class="row">
+          <input v-model="this.importance" type="range" class="form-range" min="1" max="5">
+        </div>
       </div>
       <div class="mb-3">
         <label class="form-label">備考</label>
@@ -30,6 +44,7 @@ export default {
       title: "",
       url: "",
       remarks: "",
+      importance: 3,
     }
   },
   mounted() {
@@ -43,6 +58,7 @@ export default {
         title: self.title,
         url: self.url,
         remarks: self.remarks,
+        importance: self.importance,
       })
       .then(function (res) {
         console.log(res.data)
@@ -55,3 +71,9 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.range-label-end {
+  text-align: end;
+}
+</style>

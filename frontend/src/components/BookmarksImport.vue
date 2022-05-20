@@ -112,6 +112,7 @@ export default {
         title: element.txt,
         url: element.href,
         remarks: "",
+        importance: "3",
       })
       .then(function (res) {
         console.log(res.data)
