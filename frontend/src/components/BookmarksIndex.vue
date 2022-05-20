@@ -1,7 +1,32 @@
 <template>
   <div class="bookmarks-index">
     <h2>ブックマーク一覧</h2>
-    <router-link to="/bookmarks/create">ブックマーク登録</router-link>
+    <router-link to="/bookmarks/create">ブックマーク登録</router-link>&nbsp;
+    <div class="row">
+      <div class="col">
+        <span>ソート</span>&nbsp;
+        登録日&nbsp;
+        <span>
+          <button type="button" @click="showBookmarks(1, 1)">▲</button>&nbsp;
+          <button type="button" @click="showBookmarks(1, 2)">▼</button>&nbsp;
+        </span>
+        更新日&nbsp;
+        <span>
+          <button type="button" @click="showBookmarks(2, 1)">▲</button>&nbsp;
+          <button type="button" @click="showBookmarks(2, 2)">▼</button>&nbsp;
+        </span>
+        url&nbsp;
+        <span>
+          <button type="button" @click="showBookmarks(3, 1)">▲</button>&nbsp;
+          <button type="button" @click="showBookmarks(3, 2)">▼</button>&nbsp;
+        </span>
+        重要度&nbsp;
+        <span>
+          <button type="button" @click="showBookmarks(4, 1)">▲</button>&nbsp;
+          <button type="button" @click="showBookmarks(4, 2)">▼</button>&nbsp;
+        </span>
+      </div>
+    </div>
     <!-- {{bookmarks}}<br> -->
     <div v-for="bookmark in bookmarks" :key="bookmark">
       <div class="card me-3">
@@ -29,11 +54,14 @@ const axios = require('axios').default
 export default {
   data() {
     return {
-      bookmarks: []
+      bookmarks: [],
+      sortItem: "",
+      sortAsc: "",
     }
   },
   mounted() {
-    this.showBookmarks()
+    this.showBookmarks(this.sortItem, this.sortAsc)
+    console.log("mounted exec this.showBookmarks() ")
   },
   computed: {
   },
@@ -41,16 +69,23 @@ export default {
     confirmDelete() {
       return confirm("ブックマークを削除します")
     },    
-    showBookmarks: function(){
+    showBookmarks: function(sortItem, sortAsc){
       let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
-      axios.get('/api/bookmarks')
+      axios.get('/api/bookmarks', {
+        params: {
+          sortItem: sortItem,
+          sortAsc: sortAsc,
+        }
+      })
       .then(function (res) {
         console.log(res.data)
-        self.bookmarks = res.data
+        self.bookmarks = res.data[0]
+        self.sortItem = res.data[1]
+        self.sortAsc = res.data[2]
       })
       .catch(function (err){
         console.log(err)
-        self.bookmarks = err.data
+        self.bookmarks = err.data[0]
       })
     },
     deleteBookmarks: function(id){

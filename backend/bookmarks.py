@@ -14,7 +14,7 @@ bookmarks_bp = Blueprint('bookmarks', __name__, url_prefix='/api/bookmarks')
 
 @bookmarks_bp.route('/', methods=['GET', 'POST'])
 def bookmarks():
-    if request.method == 'POST':
+    if request.method == 'POST':    #POST Method
         logging.debug('now in post bookmarks')
         json = request.get_json()
         logging.debug(json)
@@ -46,12 +46,46 @@ def bookmarks():
         return bookmark
     else:   #GET method
         logging.debug('now in get bookmarks')
+        sortItem = request.args.get('sortItem')
+        sortAsc = request.args.get('sortAsc')
+        logging.debug(sortItem)
+        logging.debug(sortAsc)
         # The kind for the new entity
         kind = "Bookmark"
         query = client.query(kind=kind)
-        logging.debug(query)
+        #logging.debug(query)
+        # ソート
+        if sortItem == "1":
+            logging.debug("sortItem == 1")
+            if sortAsc == "1":
+                query.order = ["created_at"]
+            else:
+                query.order = ["-created_at"]
+        elif sortItem == "2":
+            logging.debug("sortItem == 2")
+            if sortAsc == "1":
+                query.order = ["updated_at"]
+            else:
+                query.order = ["-updated_at"]
+        elif sortItem == "3":
+            logging.debug("sortItem == 3")
+            if sortAsc == "1":
+                query.order = ["url"]
+            else:
+                query.order = ["-url"]
+        elif sortItem == "4":
+            logging.debug("sortItem == 4")
+            if sortAsc == "1":
+                query.order = ["importance"]
+            else:
+                query.order = ["-importance"]
+        else:
+            logging.debug("sortItem != 1～4")
+            query.order = ["created_at"]
+
         result = list(query.fetch())
         #logging.debug(result)
+
         if not result:
             logging.debug('now leave get bookmarks')
             return ""
@@ -62,14 +96,13 @@ def bookmarks():
             #logging.debug(obj)
             obj["id"] = item.key.id
             #obj["importance"] = int(item.importance)
-            logging.debug(obj)
+            #logging.debug(obj)
             bookmarks.append(obj)
 
         logging.debug('now leave get bookmarks')
-        return jsonify(bookmarks)
+        return jsonify(bookmarks, sortItem, sortAsc)
         # logging.debug(jsonify(result))
         # return jsonify(result)
-
 
 @bookmarks_bp.route('/show', methods=['GET'])
 def show_bookmark():
@@ -137,7 +170,7 @@ def delete_bookmark(targetid):
     logging.debug(result)
     # delete the entity
     client.delete(result)
-    logging.debug('now leave delete bookmarks')
+    logging.debug('now leave delete bookmarks/delete/<id>')
 
     # The kind for the new entity
     kind = "Bookmark"
@@ -146,7 +179,7 @@ def delete_bookmark(targetid):
     result = list(query.fetch())
     logging.debug(result)
     if not result:
-        logging.debug('now leave delete bookmarks')
+        logging.debug('now leave delete bookmarks/delete/<id>')
         return ""
 
     bookmarks = []
