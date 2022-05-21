@@ -7,6 +7,9 @@ import BookmarksIndex from '../components/BookmarksIndex.vue'
 import BookmarksCreate from '../components/BookmarksCreate.vue'
 import BookmarksUpdate from '../components/BookmarksUpdate.vue'
 import BookmarksImport from '../components/BookmarksImport.vue'
+import TagsIndex from '../components/TagsIndex.vue'
+import TagsCreate from '../components/TagsCreate.vue'
+import TagsUpdate from '../components/TagsUpdate.vue'
 
 const routes = [
   {
@@ -38,6 +41,21 @@ const routes = [
     path: '/bookmarks-import',
     name: 'bookmarks-import',
     component: BookmarksImport
+  },
+  {
+    path: '/tags',
+    name: 'tags-index',
+    component: TagsIndex
+  },
+  {
+    path: '/tags/create',
+    name: 'tags-create',
+    component: TagsCreate
+  },
+  {
+    path: '/tags/:id',
+    name: 'tags-update',
+    component: TagsUpdate
   },
   {
     path: '/about',

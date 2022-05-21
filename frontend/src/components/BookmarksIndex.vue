@@ -2,6 +2,7 @@
   <div class="bookmarks-index">
     <h2>ブックマーク一覧</h2>
     <router-link to="/bookmarks/create">ブックマーク登録</router-link>&nbsp;
+    <router-link to="/tags">タグ一覧</router-link>&nbsp;
     <div class="row">
       <div class="col">
         <span>ソート</span>&nbsp;
@@ -39,8 +40,8 @@
           <a :href="bookmark.url" target="_blank" rel="noopener noreferrer">
             <p class="card-text">{{bookmark.url}}</p>
           </a>
-        <router-link :to="{name: 'bookmarks-update', params: {id: bookmark.id}}">ブックマーク編集</router-link>&nbsp;
-        <a href="" @click="deleteBookmarks(bookmark.id)">ブックマーク削除</a>
+        <router-link :to="{name: 'bookmarks-update', params: {id: bookmark.id}}">編集</router-link>&nbsp;
+        <a href="" @click="deleteBookmarks(bookmark.id)">削除</a>
         </div>
       </div>
     </div>

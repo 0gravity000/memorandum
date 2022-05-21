@@ -190,5 +190,5 @@ def delete_bookmark(targetid):
         logging.debug(obj)
         bookmarks.append(obj)
 
-    logging.debug('now leave delete bookmarks')
+    logging.debug('now leave delete bookmarks/delete/<id>')
     return jsonify(bookmarks)

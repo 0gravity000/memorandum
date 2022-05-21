@@ -34,7 +34,7 @@
         </a>
       </div>
       <div v-else>
-        <h3>{{element.txt}}</h3> 
+        <h3  @click="createTag(element)">{{element.txt}}</h3> 
       </div>
     </div>
 
@@ -113,6 +113,20 @@ export default {
         url: element.href,
         remarks: "",
         importance: "3",
+      })
+      .then(function (res) {
+        console.log(res.data)
+        //self.$router.push({name: "bookmarks-index"})
+      })
+      .catch(function (err){
+        console.log(err)
+      })
+    },
+    createTag: function(element){
+      //let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+      axios.post('/api/tags', {
+        name: element.txt,
+        remarks: "",
       })
       .then(function (res) {
         console.log(res.data)

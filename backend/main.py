@@ -8,12 +8,14 @@ from google.cloud import datastore
 from datetime import date, datetime
 #from model import User, Bookmark, Tag, BookmarkUser, BookmarkTag
 from bookmarks import bookmarks_bp
+from tags import tags_bp
 
 # instantiate the app
 app = Flask(__name__, static_folder='./dist/static', template_folder='./dist')
 #app = Flask(__name__)
 app.config.from_object(__name__)
 app.register_blueprint(bookmarks_bp)
+app.register_blueprint(tags_bp)
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
