@@ -30,6 +30,17 @@
         <label class="form-label">備考</label>
         <input v-model="this.bookmarks.remarks" class="form-control" placeholder="備考を入力してください">
       </div>
+
+      <label class="form-label">タグ</label>
+      <div class="col mb-3">
+        <span v-for="tag in tags" :key="tag">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" :value="tag.id" v-model="checkedTags">
+            <label class="form-check-label">{{tag.name}}</label>
+          </div>         
+        </span>
+      </div>
+
       <button type="button" @click="updateBookmark" class="btn btn-primary">更新</button>
     </form>
   </div>
@@ -44,6 +55,9 @@ export default {
     return {
       id: "",
       bookmarks: [],
+      tags: [],
+      bookmark_tags: [],
+      checkedTags: [],
     }
   },
   mounted() {
@@ -53,6 +67,21 @@ export default {
   computed: {
   },
   methods: {
+    isCheckedTag: function() {
+      console.log("isCheckedTag")
+      console.log(this.bookmark_tags)
+      if(this.bookmark_tags == "") {
+        return
+      }
+      //console.log(this.bookmark_tags.length)
+      let array = []
+      for(let i = 0; i < this.bookmark_tags.length; i++) {
+        console.log(this.bookmark_tags[i])
+        array.push(this.bookmark_tags[i].tag_id)
+      }
+      this.checkedTags = Array.from(new Set(array))
+      return
+    },
     showBookmark: function(){
       let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
       axios.get('/api/bookmarks/show', {
@@ -62,7 +91,10 @@ export default {
       })
       .then(function (res) {
         console.log(res.data)
-        self.bookmarks = res.data
+        self.bookmarks = res.data[0]
+        self.tags = res.data[1]
+        self.bookmark_tags = res.data[2]
+        self.isCheckedTag()
       })
       .catch(function (err){
         console.log(err)
@@ -76,10 +108,14 @@ export default {
         url: this.bookmarks.url,
         remarks: this.bookmarks.remarks,
         importance: this.bookmarks.importance,
+        checkedTags: this.checkedTags,
       })
       .then(function (res) {
         console.log(res.data)
-        self.bookmarks = res.data
+        self.bookmarks = res.data[0]
+        self.tags = res.data[1]
+        self.bookmark_tags = res.data[2]
+        self.isCheckedTag()
       })
       .catch(function (err){
         console.log(err)

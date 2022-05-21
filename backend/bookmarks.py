@@ -4,6 +4,7 @@ import json
 from google.cloud import datastore
 from datetime import date, datetime
 from common import add_keyid_queryresult
+from bookmark_tags import show_bookmark_tags, update_bookmark_tags
 
 # Instantiates a client
 client = datastore.Client()
@@ -118,13 +119,24 @@ def show_bookmark():
         logging.debug('now leave get bookmarks/show/<id>')
         return ""
 
-    obj = dict(result)
-    logging.debug(obj)
-    obj["id"] = result.key.id
-    logging.debug(obj)
+    bookmarks = dict(result)
+    logging.debug(bookmarks)
+    bookmarks["id"] = result.key.id
+    logging.debug(bookmarks)
+    # タグを取得
+    query = client.query(kind='Tag')
+    query.order = ["name"]
+    result = list(query.fetch())
+    tags = add_keyid_queryresult(result)
+    logging.debug('★★★')
+    logging.debug(tags)
+
+    bookmark_tags = show_bookmark_tags(targetid)
+    logging.debug('★★★')
+    logging.debug(bookmark_tags)
 
     logging.debug('now leave get bookmarks/show/<id>')
-    return jsonify(obj)
+    return jsonify(bookmarks, tags, bookmark_tags)
 
 
 @bookmarks_bp.route('/update/<targetid>', methods=['PUT'])
@@ -146,6 +158,7 @@ def update_bookmark(targetid):
     client.put(result)
     logging.debug('now leave put bookmarks/update/<id>')
 
+    #ブックマークを取得
     logging.debug(targetid)
     key = client.key("Bookmark", int(targetid))
     result = client.get(key)
@@ -154,14 +167,22 @@ def update_bookmark(targetid):
         logging.debug('now leave put bookmarks/update/<id>')
         return ""
 
-    obj = dict(result)
-    logging.debug(obj)
-    obj["id"] = result.key.id
-    logging.debug(obj)
+    bookmarks = dict(result)
+    logging.debug(bookmarks)
+    bookmarks["id"] = result.key.id
+    logging.debug(bookmarks)
+
+    #タグを取得
+    query = client.query(kind='Tag')
+    query.order = ["name"]
+    result = list(query.fetch())
+    #logging.debug(tags)
+    tags = add_keyid_queryresult(result)
+    #ブックマーク_タグを更新 
+    bookmark_tags = update_bookmark_tags(targetid, json["checkedTags"])
 
     logging.debug('now leave put bookmarks/update/<id>')
-    return jsonify(obj)
-
+    return jsonify(bookmarks, tags, bookmark_tags)
 
 @bookmarks_bp.route('/delete/<targetid>', methods=['DELETE'])
 def delete_bookmark(targetid):
