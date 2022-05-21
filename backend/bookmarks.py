@@ -1,10 +1,9 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, Blueprint
 import logging
 import json
 from google.cloud import datastore
 from datetime import date, datetime
-
-from flask import Blueprint
+from common import add_keyid_queryresult
 
 # Instantiates a client
 client = datastore.Client()
@@ -90,6 +89,8 @@ def bookmarks():
             logging.debug('now leave get bookmarks')
             return ""
 
+        bookmarks = add_keyid_queryresult(result)
+        '''
         bookmarks = []
         for item in result:
             obj = dict(item)
@@ -98,6 +99,7 @@ def bookmarks():
             #obj["importance"] = int(item.importance)
             #logging.debug(obj)
             bookmarks.append(obj)
+        '''
 
         logging.debug('now leave get bookmarks')
         return jsonify(bookmarks, sortItem, sortAsc)
@@ -172,6 +174,7 @@ def delete_bookmark(targetid):
     client.delete(result)
     logging.debug('now leave delete bookmarks/delete/<id>')
 
+    #削除後、残りのentityを返す
     # The kind for the new entity
     kind = "Bookmark"
     query = client.query(kind=kind)
@@ -182,6 +185,8 @@ def delete_bookmark(targetid):
         logging.debug('now leave delete bookmarks/delete/<id>')
         return ""
 
+    bookmarks = add_keyid_queryresult(result)
+    '''
     bookmarks = []
     for item in result:
         obj = dict(item)
@@ -189,6 +194,7 @@ def delete_bookmark(targetid):
         obj["id"] = item.key.id
         logging.debug(obj)
         bookmarks.append(obj)
+    '''
 
     logging.debug('now leave delete bookmarks/delete/<id>')
     return jsonify(bookmarks)

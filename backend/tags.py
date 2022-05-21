@@ -1,10 +1,9 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, Blueprint
 import logging
 import json
 from google.cloud import datastore
 from datetime import date, datetime
-
-from flask import Blueprint
+from common import add_keyid_queryresult
 
 # Instantiates a client
 client = datastore.Client()
@@ -56,6 +55,8 @@ def tags():
             logging.debug('now leave get tags')
             return ""
 
+        tags = add_keyid_queryresult(result)
+        '''
         tags = []
         for item in result:
             obj = dict(item)
@@ -63,6 +64,7 @@ def tags():
             obj["id"] = item.key.id
             #logging.debug(obj)
             tags.append(obj)
+        '''
 
         logging.debug('now leave get tags')
         return jsonify(tags)
@@ -144,6 +146,8 @@ def delete_bookmark(targetid):
         logging.debug('now leave delete tags/delete/<id>')
         return ""
 
+    tags = add_keyid_queryresult(result)
+    '''
     tags = []
     for item in result:
         obj = dict(item)
@@ -151,6 +155,7 @@ def delete_bookmark(targetid):
         obj["id"] = item.key.id
         logging.debug(obj)
         tags.append(obj)
+    '''
 
     logging.debug('now leave delete tags/delete/<id>')
     return jsonify(tags)
