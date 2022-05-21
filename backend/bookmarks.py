@@ -41,9 +41,37 @@ def bookmarks():
         bookmark["created_at"] = datetime.utcnow()
         logging.debug(bookmark)
         # Saves the entity
+        logging.debug('★★★')
         client.put(bookmark)
+        bookmarkid = bookmark.key.id
+        logging.debug(bookmarkid)
+
+        checkedTags = json["checkedTags"]
+        addlist = []
+        if checkedTags:
+            for checkedtag in checkedTags:
+                # 重複チェック
+                query = client.query(kind="BookmarkTags")
+                query.add_filter('bookmark_id', '=', int(bookmarkid))
+                query.add_filter('tag_id', '=', checkedtag)
+                result = list(query.fetch())
+                if result:
+                    continue
+                # The Cloud Datastore key for the new entity
+                bookmarktag_key = client.key("BookmarkTags")
+                # Prepares the new entity
+                bookmarktag = datastore.Entity(key=bookmarktag_key)
+                bookmarktag["bookmark_id"] = bookmarkid
+                bookmarktag["tag_id"] = checkedtag
+                bookmarktag["updated_at"] = datetime.utcnow()
+                bookmarktag["created_at"] = datetime.utcnow()
+                logging.debug(bookmarktag)
+                # Saves the entity
+                client.put(bookmarktag)
+
         logging.debug('now leave post bookmarks')
         return bookmark
+
     else:   #GET method
         logging.debug('now in get bookmarks')
         sortItem = request.args.get('sortItem')
@@ -128,11 +156,9 @@ def show_bookmark():
     query.order = ["name"]
     result = list(query.fetch())
     tags = add_keyid_queryresult(result)
-    logging.debug('★★★')
     logging.debug(tags)
 
     bookmark_tags = show_bookmark_tags(targetid)
-    logging.debug('★★★')
     logging.debug(bookmark_tags)
 
     logging.debug('now leave get bookmarks/show/<id>')

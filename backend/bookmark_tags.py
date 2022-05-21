@@ -10,7 +10,7 @@ def show_bookmark_tags(bookmarkid):
     logging.debug(bookmarkid)
     kind = "BookmarkTags"
     query = client.query(kind=kind)
-    result = list(query.add_filter('bookmark_id', '=', bookmarkid).fetch())
+    result = list(query.add_filter('bookmark_id', '=', int(bookmarkid)).fetch())
     # 存在チェック
     if not result:
         return ""
@@ -29,13 +29,12 @@ def show_bookmark_tags(bookmarkid):
     '''
 
 def update_bookmark_tags(bookmarkid, checkedTags):
-    logging.debug("★★★")
     logging.debug(bookmarkid)
     logging.debug(checkedTags)
     #logging.debug(checkedTags[0])
     kind = "BookmarkTags"
     query = client.query(kind=kind)
-    result = list(query.add_filter('bookmark_id', '=', bookmarkid).fetch())
+    result = list(query.add_filter('bookmark_id', '=', int(bookmarkid)).fetch())
     logging.debug(result)
     addlist = []
     deletelist = []
@@ -102,7 +101,7 @@ def update_bookmark_tags(bookmarkid, checkedTags):
         #削除
         for tagid in deletelist:
             query = client.query(kind=kind)
-            query.add_filter('bookmark_id', '=', bookmarkid)
+            query.add_filter('bookmark_id', '=', int(bookmarkid))
             query.add_filter('tag_id', '=', tagid)
             result = list(query.fetch())
             for item in result:
@@ -114,7 +113,7 @@ def update_bookmark_tags(bookmarkid, checkedTags):
         for tagid in addlist:
             # 重複チェック
             query = client.query(kind=kind)
-            query.add_filter('bookmark_id', '=', bookmarkid)
+            query.add_filter('bookmark_id', '=', int(bookmarkid))
             query.add_filter('tag_id', '=', tagid)
             result = list(query.fetch())
             if result:
@@ -124,7 +123,7 @@ def update_bookmark_tags(bookmarkid, checkedTags):
             bookmarktag_key = client.key(kind)
             # Prepares the new entity
             bookmarktag = datastore.Entity(key=bookmarktag_key)
-            bookmarktag["bookmark_id"] = bookmarkid
+            bookmarktag["bookmark_id"] = int(bookmarkid)
             bookmarktag["tag_id"] = tagid
             bookmarktag["updated_at"] = datetime.utcnow()
             bookmarktag["created_at"] = datetime.utcnow()
@@ -133,6 +132,6 @@ def update_bookmark_tags(bookmarkid, checkedTags):
             client.put(bookmarktag)
 
     query = client.query(kind=kind)
-    query.add_filter('bookmark_id', '=', bookmarkid)
+    query.add_filter('bookmark_id', '=', int(bookmarkid))
     result = list(query.fetch())
     return result

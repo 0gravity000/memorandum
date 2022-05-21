@@ -116,6 +116,7 @@ export default {
         self.tags = res.data[1]
         self.bookmark_tags = res.data[2]
         self.isCheckedTag()
+        self.$router.push({name: "bookmarks-index"})
       })
       .catch(function (err){
         console.log(err)

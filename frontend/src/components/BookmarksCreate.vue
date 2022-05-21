@@ -29,6 +29,17 @@
         <label class="form-label">備考</label>
         <input v-model="this.remarks" class="form-control" placeholder="備考を入力してください">
       </div>
+
+      <label class="form-label">タグ</label>
+      <div class="col mb-3">
+        <span v-for="tag in tags" :key="tag">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" :value="tag.id" v-model="checkedTags">
+            <label class="form-check-label">{{tag.name}}</label>
+          </div>         
+        </span>
+      </div>
+
       <button type="button" @click="createBookmark" class="btn btn-primary">登録</button>
     </form>
   </div>
@@ -45,13 +56,27 @@ export default {
       url: "",
       remarks: "",
       importance: 3,
+      tags: [],
+      checkedTags: [],
     }
   },
   mounted() {
+    this.indexTags()
   },
   computed: {
   },
   methods: {
+    indexTags: function(){
+      let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+      axios.get('/api/tags')
+      .then(function (res) {
+        console.log(res.data)
+        self.tags = res.data
+      })
+      .catch(function (err){
+        console.log(err)
+      })
+    },
     createBookmark: function(){
       let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
       axios.post('/api/bookmarks', {
@@ -59,6 +84,7 @@ export default {
         url: self.url,
         remarks: self.remarks,
         importance: self.importance,
+        checkedTags: self.checkedTags,
       })
       .then(function (res) {
         console.log(res.data)
