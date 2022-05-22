@@ -13,26 +13,26 @@ tags_bp = Blueprint('tags', __name__, url_prefix='/api/tags')
 
 @tags_bp.route('/', methods=['GET', 'POST'])
 def tags():
-    tags = Tag()
+    tag = Tag()
     if request.method == 'POST':    #POST Method
-        return tags.post_tag()
+        return tag.post_tag()
     else:   #GET method
-        return tags.get_tags()
+        return tag.get_tags()
 
 @tags_bp.route('/show', methods=['GET'])
 def show_tag():
-    tags = Tag()
-    return tags.show_tag()
+    tag = Tag()
+    return tag.show_tag()
 
 @tags_bp.route('/update/<targetid>', methods=['PUT'])
 def update_tag(targetid):
-    tags = Tag()
-    return tags.update_tag()
+    tag = Tag()
+    return tag.update_tag()
 
 @tags_bp.route('/delete/<targetid>', methods=['DELETE'])
 def delete_tag(targetid):
-    tags = Tag()
-    return tags.delete_tag()
+    tag = Tag()
+    return tag.delete_tag()
 class Tag():
     def __init__(self):
         pass

@@ -14,26 +14,26 @@ bookmarks_bp = Blueprint('bookmarks', __name__, url_prefix='/api/bookmarks')
 
 @bookmarks_bp.route('/', methods=['GET', 'POST'])
 def bookmarks():
-    bookmarks = Bookmark()
+    bookmark = Bookmark()
     if request.method == 'POST':    #POST Method
-        return bookmarks.post_bookmark()
+        return bookmark.post_bookmark()
     else:   #GET method
-        return bookmarks.get_bookmarks()
+        return bookmark.get_bookmarks()
 
 @bookmarks_bp.route('/show', methods=['GET'])
 def show_bookmark():
-    bookmarks = Bookmark()
-    return bookmarks.show_bookmark()
+    bookmark = Bookmark()
+    return bookmark.show_bookmark()
 
 @bookmarks_bp.route('/update/<targetid>', methods=['PUT'])
 def update_bookmark(targetid):
-    bookmarks = Bookmark()
-    return bookmarks.update_bookmark(targetid)
+    bookmark = Bookmark()
+    return bookmark.update_bookmark(targetid)
 
 @bookmarks_bp.route('/delete/<targetid>', methods=['DELETE'])
 def delete_bookmark(targetid):
-    bookmarks = Bookmark()
-    return bookmarks.delete_bookmark(targetid)
+    bookmark = Bookmark()
+    return bookmark.delete_bookmark(targetid)
 
 class Bookmark():
     def __init__(self):
