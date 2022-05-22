@@ -3,16 +3,18 @@
     <h2>タグ一覧</h2>
     <router-link to="/tags/create">タグ登録</router-link>&nbsp;
     <router-link to="/bookmarks">ブックマーク一覧</router-link>&nbsp;
-    <div v-for="tag in tags" :key="tag">
-      <div class="card me-3">
-        <div class="card-body">
-          <h5 class="card-title">{{tag.name}}</h5>
-          <h6 class="card-subtitle mb-2 text-muted fw-light">{{tag.remarks}}</h6>
-          <router-link :to="{name: 'tags-update', params: {id: tag.id}}">タグ編集</router-link>&nbsp;
-          <a href="" @click="deleteTags(tag.id)">タグ削除</a>
-        </div>
-      </div>
-    </div>
+    <hr>
+    <span v-for="tag in tags" :key="tag">
+      <span class="tag-name">
+        {{tag.name}}&nbsp;
+      </span>
+      <span class="tag-remarks">
+        {{tag.remarks}}&nbsp;
+      </span>
+      <router-link :to="{name: 'tags-update', params: {id: tag.id}}">編集</router-link>&nbsp;
+      <a href="" @click="deleteTags(tag.id)">削除</a>&nbsp;
+      /&nbsp;
+    </span>
   </div>
 </template>
 
@@ -65,3 +67,15 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.tag-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.tag-remarks {
+  font-size: 0.9rem;
+  font-weight: lighter;
+}
+
+</style>
