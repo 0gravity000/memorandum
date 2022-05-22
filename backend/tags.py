@@ -136,6 +136,19 @@ def delete_bookmark(targetid):
     client.delete(result)
     logging.debug('now leave delete tags/delete/<id>')
 
+    #BookmarkTagsエンティティから削除
+    # The kind for the new entity
+    kind = "BookmarkTags"
+    query = client.query(kind=kind)
+    query.add_filter('tag_id', '=', int(targetid))
+    result = list(query.fetch())
+    logging.debug(result)
+    if result:
+        for item in result:
+            logging.debug(item)
+            client.delete(item)
+
+    #削除後、残りのentityを返す
     # The kind for the new entity
     kind = "Tag"
     query = client.query(kind=kind)

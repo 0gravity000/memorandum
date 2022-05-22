@@ -221,6 +221,18 @@ def delete_bookmark(targetid):
     client.delete(result)
     logging.debug('now leave delete bookmarks/delete/<id>')
 
+    #BookmarkTagsエンティティから削除
+    # The kind for the new entity
+    kind = "BookmarkTags"
+    query = client.query(kind=kind)
+    query.add_filter('bookmark_id', '=', int(targetid))
+    result = list(query.fetch())
+    logging.debug(result)
+    if result:
+        for item in result:
+            logging.debug(item)
+            client.delete(item)
+
     #削除後、残りのentityを返す
     # The kind for the new entity
     kind = "Bookmark"
@@ -233,15 +245,6 @@ def delete_bookmark(targetid):
         return ""
 
     bookmarks = add_keyid_queryresult(result)
-    '''
-    bookmarks = []
-    for item in result:
-        obj = dict(item)
-        logging.debug(obj)
-        obj["id"] = item.key.id
-        logging.debug(obj)
-        bookmarks.append(obj)
-    '''
 
     logging.debug('now leave delete bookmarks/delete/<id>')
     return jsonify(bookmarks)
