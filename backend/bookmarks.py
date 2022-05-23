@@ -4,7 +4,8 @@ import json
 from google.cloud import datastore
 from datetime import date, datetime
 from common import add_keyid_queryresult
-from bookmark_tags import show_bookmark_tags, update_bookmark_tags
+from bookmark_tags import BookmarkTags, show_bookmark_tags, update_bookmark_tags
+from tags import Tag
 
 # Instantiates a client
 client = datastore.Client()
@@ -18,7 +19,24 @@ def bookmarks():
     if request.method == 'POST':    #POST Method
         return bookmark.post_bookmark()
     else:   #GET method
-        return bookmark.get_bookmarks()
+        sortItem = request.args.get('sortItem')
+        sortAsc = request.args.get('sortAsc')
+        logging.debug(sortItem)
+        logging.debug(sortAsc)
+        bookmarks = bookmark.get_bookmarks(sortItem, sortAsc)
+        # タグを取得
+        tag = Tag()
+        tags = tag.get_tags()
+        # ブックマークタグを取得
+        bookmarktags = BookmarkTags()
+        bookmark_tags = bookmarktags.get_bookmark_tags()
+        logging.debug(bookmarks)
+        logging.debug(sortItem)
+        logging.debug(sortAsc)
+        logging.debug(tags)
+        logging.debug(bookmark_tags)
+        return jsonify(bookmarks, sortItem, sortAsc, tags, bookmark_tags)
+        #return jsonify(bookmarks)
 
 @bookmarks_bp.route('/show', methods=['GET'])
 def show_bookmark():
@@ -39,12 +57,8 @@ class Bookmark():
     def __init__(self):
         pass
 
-    def get_bookmarks(self):
+    def get_bookmarks(self ,sortItem ,sortAsc):
         logging.debug('now in get bookmarks')
-        sortItem = request.args.get('sortItem')
-        sortAsc = request.args.get('sortAsc')
-        logging.debug(sortItem)
-        logging.debug(sortAsc)
         # The kind for the new entity
         kind = "Bookmark"
         query = client.query(kind=kind)
@@ -80,27 +94,16 @@ class Bookmark():
 
         result = list(query.fetch())
         #logging.debug(result)
-
         if not result:
             logging.debug('now leave get bookmarks')
             return ""
 
         bookmarks = add_keyid_queryresult(result)
-        '''
-        bookmarks = []
-        for item in result:
-            obj = dict(item)
-            #logging.debug(obj)
-            obj["id"] = item.key.id
-            #obj["importance"] = int(item.importance)
-            #logging.debug(obj)
-            bookmarks.append(obj)
-        '''
 
         logging.debug('now leave get bookmarks')
-        return jsonify(bookmarks, sortItem, sortAsc)
-        # logging.debug(jsonify(result))
-        # return jsonify(result)
+        return bookmarks
+        # return jsonify(bookmarks)
+        # return jsonify(bookmarks, sortItem, sortAsc)
 
     def post_bookmark(self):
         logging.debug('now in post bookmarks')

@@ -135,3 +135,19 @@ def update_bookmark_tags(bookmarkid, checkedTags):
     query.add_filter('bookmark_id', '=', int(bookmarkid))
     result = list(query.fetch())
     return result
+
+class BookmarkTags():
+    def __init__(self):
+        pass
+
+    def get_bookmark_tags(self):
+        logging.debug('now in get bookmark_tags')
+        kind = "BookmarkTags"
+        query = client.query(kind=kind)
+        result = list(query.fetch())
+        if not result:
+            logging.debug('now leave get bookmark_tags')
+            return ""
+        logging.debug('now leave get bookmark_tags')
+        return result
+        # return jsonify(result)

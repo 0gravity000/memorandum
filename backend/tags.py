@@ -17,7 +17,7 @@ def tags():
     if request.method == 'POST':    #POST Method
         return tag.post_tag()
     else:   #GET method
-        return tag.get_tags()
+        return jsonify(tag.get_tags())
 
 @tags_bp.route('/show', methods=['GET'])
 def show_tag():
@@ -64,7 +64,8 @@ class Tag():
         '''
 
         logging.debug('now leave get tags')
-        return jsonify(tags)
+        return tags
+        # return jsonify(tags)
     
     def post_tag(self):
         logging.debug('now in post tags')
@@ -94,7 +95,7 @@ class Tag():
         logging.debug('now leave post tags')
         return tag
 
-    def show_tag():
+    def show_tag(self):
         logging.debug('now in get tags/show/<id>')
         targetid = request.args.get('id')
         logging.debug(targetid)
@@ -113,7 +114,7 @@ class Tag():
         logging.debug('now leave get tags/show/<id>')
         return jsonify(obj)
 
-    def update_tag(targetid):
+    def update_tag(self, targetid):
         logging.debug('now in put tags/update/<id>')
         json = request.get_json()
         logging.debug(json)
@@ -145,7 +146,7 @@ class Tag():
         logging.debug('now leave put tags/update/<id>')
         return jsonify(obj)
 
-    def delete_tag(targetid):
+    def delete_tag(self, targetid):
         logging.debug('now in delete tags/delete/<id>')
         logging.debug(targetid)
         key = client.key("Tag", int(targetid))
