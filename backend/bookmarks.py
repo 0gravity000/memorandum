@@ -4,12 +4,12 @@ import json
 from google.cloud import datastore
 from datetime import date, datetime
 from common import add_keyid_queryresult
-from bookmark_tags import BookmarkTags, show_bookmark_tags, update_bookmark_tags
+from bookmark_tags import BookmarkTags
+#from bookmark_tags import BookmarkTags, show_bookmark_tags, update_bookmark_tags
 from tags import Tag
 
 # Instantiates a client
 client = datastore.Client()
-
 # Blueprintオブジェクトを生成
 bookmarks_bp = Blueprint('bookmarks', __name__, url_prefix='/api/bookmarks')
 
@@ -184,8 +184,8 @@ class Bookmark():
         result = list(query.fetch())
         tags = add_keyid_queryresult(result)
         logging.debug(tags)
-
-        bookmark_tags = show_bookmark_tags(targetid)
+        bookmarktags = BookmarkTags()
+        bookmark_tags = bookmarktags.show_bookmark_tags(targetid)
         logging.debug(bookmark_tags)
 
         logging.debug('now leave get bookmarks/show/<id>')
@@ -229,8 +229,9 @@ class Bookmark():
         result = list(query.fetch())
         #logging.debug(tags)
         tags = add_keyid_queryresult(result)
-        #ブックマーク_タグを更新 
-        bookmark_tags = update_bookmark_tags(targetid, json["checkedTags"])
+        #ブックマーク_タグを更新
+        bookmarktags = BookmarkTags()
+        bookmark_tags = bookmarktags.update_bookmark_tags(targetid, json["checkedTags"])
 
         logging.debug('now leave put bookmarks/update/<id>')
         return jsonify(bookmarks, tags, bookmark_tags)
@@ -245,17 +246,9 @@ class Bookmark():
         client.delete(result)
         logging.debug('now leave delete bookmarks/delete/<id>')
 
-        #BookmarkTagsエンティティから削除
-        # The kind for the new entity
-        kind = "BookmarkTags"
-        query = client.query(kind=kind)
-        query.add_filter('bookmark_id', '=', int(targetid))
-        result = list(query.fetch())
-        logging.debug(result)
-        if result:
-            for item in result:
-                logging.debug(item)
-                client.delete(item)
+        #BookmarkTagsエンティティから該当ブックマークを削除
+        bookmarktags = BookmarkTags()
+        bookmarktags.delete_bookmarks(targetid)
 
         #削除後、残りのentityを返す
         # The kind for the new entity

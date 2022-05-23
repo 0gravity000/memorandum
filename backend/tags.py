@@ -4,10 +4,10 @@ import json
 from google.cloud import datastore
 from datetime import date, datetime
 from common import add_keyid_queryresult
+from bookmark_tags import BookmarkTags
 
 # Instantiates a client
 client = datastore.Client()
-
 # Blueprintオブジェクトを生成
 tags_bp = Blueprint('tags', __name__, url_prefix='/api/tags')
 
@@ -27,12 +27,12 @@ def show_tag():
 @tags_bp.route('/update/<targetid>', methods=['PUT'])
 def update_tag(targetid):
     tag = Tag()
-    return tag.update_tag()
+    return tag.update_tag(targetid)
 
 @tags_bp.route('/delete/<targetid>', methods=['DELETE'])
 def delete_tag(targetid):
     tag = Tag()
-    return tag.delete_tag()
+    return tag.delete_tag(targetid)
 class Tag():
     def __init__(self):
         pass
@@ -156,17 +156,9 @@ class Tag():
         client.delete(result)
         logging.debug('now leave delete tags/delete/<id>')
 
-        #BookmarkTagsエンティティから削除
-        # The kind for the new entity
-        kind = "BookmarkTags"
-        query = client.query(kind=kind)
-        query.add_filter('tag_id', '=', int(targetid))
-        result = list(query.fetch())
-        logging.debug(result)
-        if result:
-            for item in result:
-                logging.debug(item)
-                client.delete(item)
+        #BookmarkTagsエンティティから該当タグを削除
+        bookmarktags = BookmarkTags()
+        bookmarktags.delete_tags(targetid)
 
         #削除後、残りのentityを返す
         # The kind for the new entity
