@@ -10,6 +10,20 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item">
+            <router-link to="/auth/register">
+              <a class="nav-link">ユーザー登録</a>
+            </router-link>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <router-link to="/auth/login">
+              <a class="nav-link">ログイン</a>
+            </router-link>
+          </li>
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item">
             <router-link to="/about">
               <a class="nav-link">About</a>
             </router-link>

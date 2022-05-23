@@ -10,6 +10,8 @@ import BookmarksImport from '../components/BookmarksImport.vue'
 import TagsIndex from '../components/TagsIndex.vue'
 import TagsCreate from '../components/TagsCreate.vue'
 import TagsUpdate from '../components/TagsUpdate.vue'
+import AuthRegister from '../components/AuthRegister.vue'
+import AuthLogin from '../components/AuthLogin.vue'
 
 const routes = [
   {
@@ -56,6 +58,16 @@ const routes = [
     path: '/tags/:id',
     name: 'tags-update',
     component: TagsUpdate
+  },
+  {
+    path: '/auth/register',
+    name: 'auth-register',
+    component: AuthRegister
+  },
+  {
+    path: '/auth/login',
+    name: 'auth-login',
+    component: AuthLogin
   },
   {
     path: '/about',

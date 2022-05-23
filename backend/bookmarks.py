@@ -30,11 +30,11 @@ def bookmarks():
         # ブックマークタグを取得
         bookmarktags = BookmarkTags()
         bookmark_tags = bookmarktags.get_bookmark_tags()
-        logging.debug(bookmarks)
-        logging.debug(sortItem)
-        logging.debug(sortAsc)
-        logging.debug(tags)
-        logging.debug(bookmark_tags)
+        # logging.debug(bookmarks)
+        # logging.debug(sortItem)
+        # logging.debug(sortAsc)
+        # logging.debug(tags)
+        # logging.debug(bookmark_tags)
         return jsonify(bookmarks, sortItem, sortAsc, tags, bookmark_tags)
         #return jsonify(bookmarks)
 

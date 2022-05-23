@@ -1,5 +1,6 @@
 <template>
   <div class="bookmarks-index">
+    <a href="#" @click="authLogout">ログアウト</a>
     <h2>ブックマーク一覧</h2>
     <router-link to="/bookmarks/create">ブックマーク登録</router-link>&nbsp;
     <router-link to="/tags">タグ一覧</router-link>&nbsp;
@@ -168,7 +169,17 @@ export default {
     },
     confirmDelete() {
       return confirm("ブックマークを削除します")
-    },    
+    },
+    authLogout: function(){
+      //let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+      axios.get('/api/auth/logout')
+      .then(function (res) {
+        console.log(res.data)
+      })
+      .catch(function (err){
+        console.log(err)
+      })
+    },
     showBookmarks: function(sortItem, sortAsc){
       let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
       axios.get('/api/bookmarks', {
