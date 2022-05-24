@@ -5,6 +5,8 @@ from google.cloud import datastore
 from datetime import date, datetime
 from common import add_keyid_queryresult
 from bookmark_tags import BookmarkTags
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from tag_users import TagUsers
 
 # Instantiates a client
 client = datastore.Client()
@@ -15,7 +17,23 @@ tags_bp = Blueprint('tags', __name__, url_prefix='/api/tags')
 def tags():
     tag = Tag()
     if request.method == 'POST':    #POST Method
-        return tag.post_tag()
+        # ログインチェック
+        logging.debug(current_user)
+        if not current_user.is_authenticated:
+            return "User is not authenticated"
+
+        json = request.get_json()
+        logging.debug(json)
+        # Tagエンティティに登録
+        rtntag = tag.post_tag(json)
+        # BookmarkTagsエンティティに登録
+        # bookmark_tags.pyで実施
+        tagid = rtntag.key.id
+        logging.debug(tagid)
+        # TagUsersエンティティに登録
+        taguser = TagUsers()
+        taguser.post_tag_users(tagid)
+        return rtntag
     else:   #GET method
         return jsonify(tag.get_tags())
 
@@ -33,7 +51,7 @@ def update_tag(targetid):
 def delete_tag(targetid):
     tag = Tag()
     return tag.delete_tag(targetid)
-class Tag():
+class Tag(UserMixin):
     def __init__(self):
         pass
 
@@ -67,14 +85,10 @@ class Tag():
         return tags
         # return jsonify(tags)
     
-    def post_tag(self):
+    def post_tag(self, json):
         logging.debug('now in post tags')
-        json = request.get_json()
-        logging.debug(json)
         # The kind for the new entity
         kind = "Tag"
-        # The name/ID for the new entity
-        #name = "foo"
         # 重複チェック
         query = client.query(kind=kind)
         result = list(query.add_filter('name', '=', json["name"]).fetch())
@@ -154,11 +168,12 @@ class Tag():
         logging.debug(result)
         # delete the entity
         client.delete(result)
-        logging.debug('now leave delete tags/delete/<id>')
-
         #BookmarkTagsエンティティから該当タグを削除
         bookmarktags = BookmarkTags()
         bookmarktags.delete_tags(targetid)
+        #TagUsersエンティティから該当ブックマークを削除
+        tagusers = TagUsers()
+        tagusers.delete_tags(targetid)
 
         #削除後、残りのentityを返す
         # The kind for the new entity

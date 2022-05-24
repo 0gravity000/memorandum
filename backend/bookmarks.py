@@ -7,6 +7,9 @@ from common import add_keyid_queryresult
 from bookmark_tags import BookmarkTags
 #from bookmark_tags import BookmarkTags, show_bookmark_tags, update_bookmark_tags
 from tags import Tag
+from bookmark_users import BookmarkUsers
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+
 
 # Instantiates a client
 client = datastore.Client()
@@ -17,7 +20,24 @@ bookmarks_bp = Blueprint('bookmarks', __name__, url_prefix='/api/bookmarks')
 def bookmarks():
     bookmark = Bookmark()
     if request.method == 'POST':    #POST Method
-        return bookmark.post_bookmark()
+        # ログインチェック
+        logging.debug(current_user)
+        if not current_user.is_authenticated:
+            return "User is not authenticated"
+
+        json = request.get_json()
+        logging.debug(json)
+        # Bookmarkエンティティに登録
+        bkmark = bookmark.post_bookmark(json)
+        # BookmarkTagsエンティティに登録
+        bookmarkid = bkmark.key.id
+        logging.debug(bookmarkid)
+        bookmarktag = BookmarkTags()
+        bookmarktag.post_bookmark_tags(bookmarkid, json)
+        # BookmarkUsersエンティティに登録
+        bookmarkuser = BookmarkUsers()
+        bookmarkuser.post_bookmark_users(bookmarkid)
+        return bkmark
     else:   #GET method
         sortItem = request.args.get('sortItem')
         sortAsc = request.args.get('sortAsc')
@@ -53,7 +73,7 @@ def delete_bookmark(targetid):
     bookmark = Bookmark()
     return bookmark.delete_bookmark(targetid)
 
-class Bookmark():
+class Bookmark(UserMixin):
     def __init__(self):
         pass
 
@@ -105,10 +125,8 @@ class Bookmark():
         # return jsonify(bookmarks)
         # return jsonify(bookmarks, sortItem, sortAsc)
 
-    def post_bookmark(self):
+    def post_bookmark(self, json):
         logging.debug('now in post bookmarks')
-        json = request.get_json()
-        logging.debug(json)
         # The kind for the new entity
         kind = "Bookmark"
         # The name/ID for the new entity
@@ -132,33 +150,7 @@ class Bookmark():
         bookmark["created_at"] = datetime.utcnow()
         logging.debug(bookmark)
         # Saves the entity
-        logging.debug('★★★')
         client.put(bookmark)
-        bookmarkid = bookmark.key.id
-        logging.debug(bookmarkid)
-
-        checkedTags = json["checkedTags"]
-        addlist = []
-        if checkedTags:
-            for checkedtag in checkedTags:
-                # 重複チェック
-                query = client.query(kind="BookmarkTags")
-                query.add_filter('bookmark_id', '=', int(bookmarkid))
-                query.add_filter('tag_id', '=', checkedtag)
-                result = list(query.fetch())
-                if result:
-                    continue
-                # The Cloud Datastore key for the new entity
-                bookmarktag_key = client.key("BookmarkTags")
-                # Prepares the new entity
-                bookmarktag = datastore.Entity(key=bookmarktag_key)
-                bookmarktag["bookmark_id"] = bookmarkid
-                bookmarktag["tag_id"] = checkedtag
-                bookmarktag["updated_at"] = datetime.utcnow()
-                bookmarktag["created_at"] = datetime.utcnow()
-                logging.debug(bookmarktag)
-                # Saves the entity
-                client.put(bookmarktag)
 
         logging.debug('now leave post bookmarks')
         return bookmark
@@ -244,11 +236,12 @@ class Bookmark():
         logging.debug(result)
         # delete the entity
         client.delete(result)
-        logging.debug('now leave delete bookmarks/delete/<id>')
-
         #BookmarkTagsエンティティから該当ブックマークを削除
         bookmarktags = BookmarkTags()
         bookmarktags.delete_bookmarks(targetid)
+        #BookmarkUsersエンティティから該当ブックマークを削除
+        bookmarkusers = BookmarkUsers()
+        bookmarkusers.delete_bookmarks(targetid)
 
         #削除後、残りのentityを返す
         # The kind for the new entity
@@ -262,6 +255,5 @@ class Bookmark():
             return ""
 
         bookmarks = add_keyid_queryresult(result)
-
         logging.debug('now leave delete bookmarks/delete/<id>')
         return jsonify(bookmarks)

@@ -7,34 +7,46 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 # Instantiates a client
 client = datastore.Client()
 
-class BookmarkTags(UserMixin):
+class BookmarkUsers(UserMixin):
     def __init__(self):
         pass
 
-    def post_bookmark_tags(self, bookmarkid, json):
-        checkedTags = json["checkedTags"]
-        if checkedTags:
-            for checkedtag in checkedTags:
-                # 重複チェック
-                query = client.query(kind="BookmarkTags")
-                query.add_filter('bookmark_id', '=', int(bookmarkid))
-                query.add_filter('tag_id', '=', checkedtag)
-                result = list(query.fetch())
-                if result:
-                    continue
-                # The Cloud Datastore key for the new entity
-                bookmarktag_key = client.key("BookmarkTags")
-                # Prepares the new entity
-                bookmarktag = datastore.Entity(key=bookmarktag_key)
-                bookmarktag["bookmark_id"] = bookmarkid
-                bookmarktag["tag_id"] = checkedtag
-                bookmarktag["updated_at"] = datetime.utcnow()
-                bookmarktag["created_at"] = datetime.utcnow()
-                logging.debug(bookmarktag)
-                # Saves the entity
-                client.put(bookmarktag)
+    def post_bookmark_users(self, bookmarkid):
+        logging.debug(bookmarkid)
+        # 重複チェック
+        query = client.query(kind="BookmarkUsers")
+        query.add_filter('bookmark_id', '=', int(bookmarkid))
+        query.add_filter('user_id', '=', current_user.id)
+        result = list(query.fetch())
+        if result:
+            return "already registerd"
+        # The Cloud Datastore key for the new entity
+        bookmarkuser_key = client.key("BookmarkUsers")
+        # Prepares the new entity
+        bookmarkuser = datastore.Entity(key=bookmarkuser_key)
+        bookmarkuser["bookmark_id"] = bookmarkid
+        bookmarkuser["user_id"] = current_user.id
+        bookmarkuser["updated_at"] = datetime.utcnow()
+        bookmarkuser["created_at"] = datetime.utcnow()
+        logging.debug(bookmarkuser)
+        # Saves the entity
+        client.put(bookmarkuser)
 
+    def delete_bookmarks(self, targetid):
+        logging.debug('now in delete bookmarks in bookmark_users')
+        # The kind for the new entity
+        kind = "BookmarkUsers"
+        query = client.query(kind=kind)
+        query.add_filter('bookmark_id', '=', int(targetid))
+        result = list(query.fetch())
+        logging.debug(result)
+        if result:
+            for item in result:
+                logging.debug(item)
+                client.delete(item)
+        logging.debug('now leave delete bookmarks in bookmark_users')
 
+'''
     def show_bookmark_tags(self, bookmarkid):
         logging.debug(bookmarkid)
         kind = "BookmarkTags"
@@ -45,17 +57,6 @@ class BookmarkTags(UserMixin):
             return ""
 
         return result
-
-        '''
-        bookmark_tags = []
-        for item in result:
-            tagid = item.tag_id
-            key = client.key("Tag", int(tagid))
-            tag = client.get(key)
-            logging.debug(tag)
-            bookmark_tags.append(tag)
-        return jsonify(bookmark_tags)
-        '''
 
     def update_bookmark_tags(self, bookmarkid, checkedTags):
         logging.debug(bookmarkid)
@@ -93,11 +94,6 @@ class BookmarkTags(UserMixin):
                         #ここで処理はNG
                         else:
                             pass
-                            '''
-                            logging.debug("追加")
-                            logging.debug(checkedtag)
-                            addlist.append(checkedtag)
-                            '''
                     #BookmarkTags：あり、checkedTags：なし ⇒削除
                     if hitflag == False:
                         logging.debug("削除")
@@ -204,3 +200,4 @@ class BookmarkTags(UserMixin):
                 logging.debug(item)
                 client.delete(item)
         logging.debug('now leave delete tags in bookmark_tags')
+'''

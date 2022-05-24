@@ -39,13 +39,13 @@ client = datastore.Client()
 @login_manager.user_loader
 def load_user(user_id):  #userをロードするためのcallback functionを定義
     # ？load_userの引数は、Userクラス？で定義したget_id()が返す値です。
+    # これはstrでなければならないことに注意してください。
     # ？user_idはユーザーテーブルの主キーにすぎないため、ユーザーのクエリで使用します
-    #これはstrでなければならないことに注意してください。
     logging.debug('now in load_user')
     user = User()   
     logging.debug(user)
-    return user.id
-    # return User.query.get(int(user_id))
+    return user #認証されたユーザを特定するインスタンス
+    #return user.id #これはダメ。インスタンスを返さないとダメ
 
 @app.route('/api/auth/register', methods=['POST'])
 def auth_register():

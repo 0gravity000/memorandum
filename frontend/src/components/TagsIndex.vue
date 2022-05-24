@@ -1,5 +1,6 @@
 <template>
   <div class="tags-index">
+    <a href="#" @click="authLogout">ログアウト</a>
     <h2>タグ一覧</h2>
     <router-link to="/tags/create">タグ登録</router-link>&nbsp;
     <router-link to="/bookmarks">ブックマーク一覧</router-link>&nbsp;
@@ -38,6 +39,16 @@ export default {
     confirmDelete() {
       return confirm("タグを削除します")
     },    
+    authLogout: function(){
+      //let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+      axios.get('/api/auth/logout')
+      .then(function (res) {
+        console.log(res.data)
+      })
+      .catch(function (err){
+        console.log(err)
+      })
+    },
     showTags: function(){
       let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
       axios.get('/api/tags')
