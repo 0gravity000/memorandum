@@ -1,10 +1,12 @@
 <template>
   <div class="bookmarks-index">
-    <p>{{authUser.email}}&nbsp;さん
+    <p>{{authEmailOrNickname()}}&nbsp;さん
       <a href="#" @click="authLogout">ログアウト</a>
     </p>
     <h2>ブックマーク一覧</h2>
-    <router-link to="/bookmarks/create">ブックマーク登録</router-link>&nbsp;
+    <span v-show="authUser.email != 'ゲスト'">
+      <router-link to="/bookmarks/create">ブックマーク登録</router-link>&nbsp;
+    </span>
     <router-link to="/tags">タグ一覧</router-link>&nbsp;
     <div class="row">
       <div class="col">
@@ -69,8 +71,12 @@
             <a :href="bookmark.url" target="_blank" rel="noopener noreferrer">
               <p class="card-text">{{bookmark.url}}</p>
             </a>
-          <router-link :to="{name: 'bookmarks-update', params: {id: bookmark.id}}">編集</router-link>&nbsp;
-          <a href="" @click="deleteBookmarks(bookmark.id)">削除</a>
+            <span>Bookmarked By&nbsp;{{useridToUserEmailOrNickname(bookmarkedUserId(bookmark.id))}}&nbsp;</span>
+            <!-- このブックマークがログインユーザーのものの場合表示 -->
+            <span v-show="bookmarkedUserId(bookmark.id) == authUser.id">
+              <router-link :to="{name: 'bookmarks-update', params: {id: bookmark.id}}">編集</router-link>&nbsp;
+              <a href="" @click="deleteBookmarks(bookmark.id)">削除</a>
+            </span>
           </div>
         </div>
       </div>
@@ -96,6 +102,8 @@ export default {
       tags: [],
       bookmark_tags: [],
       filteredTags: [],
+      users: [],
+      bookmark_users: [],
     }
   },
   mounted() {
@@ -105,6 +113,37 @@ export default {
   computed: {
   },
   methods: {
+    authEmailOrNickname(){
+      if (this.authUser.nickname == "") {
+        return this.authUser.email
+      }
+      return this.authUser.nickname
+    },
+    useridToUserEmailOrNickname(user_id){
+      for(let i=0; i < this.users.length; i++) {
+        //ユーザidからemail or nicknameを返す
+        if (this.users[i].id == user_id) {
+          if (this.users[i].nickname == "") {
+            return this.users[i].email
+          }
+          return this.users[i].nickname
+        }
+      }
+      //配列に存在しない場合
+      console.log("該当なし")
+      return ""
+    },
+    bookmarkedUserId(bookmark_id){
+      for(let i=0; i < this.bookmark_users.length; i++) {
+        //該当のブックマークのユーザidチェック
+        if (this.bookmark_users[i].bookmark_id == bookmark_id) {
+            return this.bookmark_users[i].user_id
+        }
+      }
+      //配列に存在しない場合
+      console.log("該当なし")
+      return "該当なし"
+    },
     shouldDisplayThisBookmark(bookmark_id) {
       //filteredTagsが空の場合は全ブックマークを表示
       if (this.filteredTags == "") {
@@ -182,7 +221,7 @@ export default {
       axios.get('/api/auth/logout')
       .then(function (res) {
         console.log(res.data)
-        let resdate = {email: "ゲスト"}
+        let resdate = {id: "", email: "ゲスト", password: "", nickname: ""}
         self.$emit('update-auth-notification', resdate)
         //self.$store.commit('clearAuthUser')  //vuexのstateで管理
       })
@@ -205,6 +244,8 @@ export default {
         self.sortAsc = res.data[2]
         self.tags = res.data[3]
         self.bookmark_tags = res.data[4]
+        self.users = res.data[5]
+        self.bookmark_users = res.data[6]
       })
       .catch(function (err){
         console.log(err)

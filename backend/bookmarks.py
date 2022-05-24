@@ -9,7 +9,8 @@ from bookmark_tags import BookmarkTags
 from tags import Tag
 from bookmark_users import BookmarkUsers
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-
+from users import User
+from bookmark_tags import BookmarkTags
 
 # Instantiates a client
 client = datastore.Client()
@@ -49,12 +50,14 @@ def bookmarks():
         # ブックマークタグを取得
         bookmarktags = BookmarkTags()
         bookmark_tags = bookmarktags.get_bookmark_tags()
-        # logging.debug(bookmarks)
-        # logging.debug(sortItem)
-        # logging.debug(sortAsc)
-        # logging.debug(tags)
-        # logging.debug(bookmark_tags)
-        return jsonify(bookmarks, sortItem, sortAsc, tags, bookmark_tags)
+        # ユーザーを取得
+        user = User()
+        users = user.get_users()
+        # ブックマークユーザーを取得
+        bookmarkusers = BookmarkUsers()
+        bookmark_users = bookmarkusers.get_bookmark_users()
+
+        return jsonify(bookmarks, sortItem, sortAsc, tags, bookmark_tags, users, bookmark_users)
         #return jsonify(bookmarks)
 
 @bookmarks_bp.route('/show', methods=['GET'])

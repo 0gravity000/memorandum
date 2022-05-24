@@ -1,10 +1,12 @@
 <template>
   <div class="tags-index">
-    <p>{{authUser.email}}&nbsp;さん
+    <p>{{authEmailOrNickname()}}&nbsp;さん
       <a href="#" @click="authLogout">ログアウト</a>
     </p>
     <h2>タグ一覧</h2>
-    <router-link to="/tags/create">タグ登録</router-link>&nbsp;
+    <span v-show="isAdminUser()">
+      <router-link to="/tags/create">タグ登録</router-link>&nbsp;
+    </span>
     <router-link to="/bookmarks">ブックマーク一覧</router-link>&nbsp;
     <hr>
     <span v-for="tag in tags" :key="tag">
@@ -14,8 +16,10 @@
       <span class="tag-remarks">
         {{tag.remarks}}&nbsp;
       </span>
-      <router-link :to="{name: 'tags-update', params: {id: tag.id}}">編集</router-link>&nbsp;
-      <a href="" @click="deleteTags(tag.id)">削除</a>&nbsp;
+      <span v-show="isAdminUser()">
+        <router-link :to="{name: 'tags-update', params: {id: tag.id}}">編集</router-link>&nbsp;
+        <a href="" @click="deleteTags(tag.id)">削除</a>&nbsp;
+      </span>
       /&nbsp;
     </span>
   </div>
@@ -43,6 +47,18 @@ export default {
   computed: {
   },
   methods: {
+    authEmailOrNickname(){
+      if (this.authUser.nickname == "") {
+        return this.authUser.email
+      }
+      return this.authUser.nickname
+    },
+    isAdminUser(){
+      if (this.authUser.email == "0gravity000@gmail.com") {
+        return true
+      }
+      return false
+    },
     confirmDelete() {
       return confirm("タグを削除します")
     },    
@@ -51,7 +67,7 @@ export default {
       axios.get('/api/auth/logout')
       .then(function (res) {
         console.log(res.data)
-        let resdate = {email: "ゲスト"}
+        let resdate = {id: "", email: "ゲスト", password: "", nickname: ""}
         self.$emit('update-auth-notification', resdate)
         //self.$store.commit('clearAuthUser')  //vuexのstateで管理
       })

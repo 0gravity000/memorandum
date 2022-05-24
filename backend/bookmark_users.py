@@ -46,6 +46,17 @@ class BookmarkUsers(UserMixin):
                 client.delete(item)
         logging.debug('now leave delete bookmarks in bookmark_users')
 
+    def get_bookmark_users(self):
+        logging.debug('now in get bookmark_users')
+        kind = "BookmarkUsers"
+        query = client.query(kind=kind)
+        result = list(query.fetch())
+        if not result:
+            logging.debug('now leave get bookmark_users')
+            return ""
+        logging.debug('now leave get bookmark_users')
+        return result
+
 '''
     def show_bookmark_tags(self, bookmarkid):
         logging.debug(bookmarkid)
