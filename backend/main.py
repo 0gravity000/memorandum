@@ -42,7 +42,7 @@ def load_user(user_id):  #userをロードするためのcallback functionを定
     # これはstrでなければならないことに注意してください。
     # ？user_idはユーザーテーブルの主キーにすぎないため、ユーザーのクエリで使用します
     logging.debug('now in load_user')
-    user = User()   
+    user = User()
     logging.debug(user)
     return user #認証されたユーザを特定するインスタンス
     #return user.id #これはダメ。インスタンスを返さないとダメ
@@ -57,13 +57,21 @@ def auth_register():
 
 @app.route('/api/auth/login', methods=['POST'])
 def auth_login():
-    json = request.get_json()
-    logging.debug(json)
+    logging.debug('now in login user')
     user = User()
-    rtn = user.login_user()
+    rtnuser = user.login_user()
     # Flask-loginのログイン処理
     login_user(user)    #★login_user 関数を使用してログインする
-    return jsonify(rtn)
+    logging.debug(current_user.email)
+    logging.debug(current_user.id)
+
+    # idを付加する    
+    user_with_id = dict(rtnuser)
+    user_with_id["id"] = rtnuser.key.id
+    logging.debug(user_with_id)
+    logging.debug('now leave login user')
+
+    return jsonify(user_with_id)
 
 @app.route('/api/auth/logout', methods=['GET'])
 def auth_logout():
@@ -76,6 +84,22 @@ def auth_logout():
     User.nickname = None
 
     return "logout"
+
+@app.route('/api/auth/check', methods=['GET'])
+def auth_check():
+    logging.debug('now in auth_check')
+    logging.debug(current_user.is_authenticated)
+    if not current_user.is_authenticated:
+        user = {"email": "ゲスト"}
+        return user
+
+    user = User()
+    rtnuser = user.get_current_user_obj()
+    # key = client.key("User", int(current_user.id))
+    # user = client.get(key)
+    # logging.debug('now leave auth_check')
+    return rtnuser
+
 
 class User(UserMixin): # UserMixinを継承 Flask-Loginの属性をモデルに追加
     id = None
@@ -97,8 +121,8 @@ class User(UserMixin): # UserMixinを継承 Flask-Loginの属性をモデルに�
         https://flask-login.readthedocs.io/en/latest/_modules/flask_login/mixins/#UserMixin
         """
         logging.debug('now User get_id')
-        logging.debug(User.id)
-        return (User.id)
+        logging.debug(str(User.id))
+        return (str(User.id))
 
     def registet_user(self):
         logging.debug('now in register user')
@@ -131,7 +155,6 @@ class User(UserMixin): # UserMixinを継承 Flask-Loginの属性をモデルに�
         return user
 
     def login_user(self):
-        logging.debug('now in login user')
         json = request.get_json()
         logging.debug(json)
         # バリデーション
@@ -158,21 +181,27 @@ class User(UserMixin): # UserMixinを継承 Flask-Loginの属性をモデルに�
 
         logging.debug(result[0])
         user = result[0]
-        # 複数itemになる場合はないはず。（複数itemになったらこれはダメ）
-        # for user in result:
-        #     #user = dict(item)
-        #     logging.debug('★★★')
-        #     logging.debug(user)
-        #     #パスワードの一致チェック
-        #     if not check_password_hash(user["password"], json["password"]):
-        #         return "password not match"
-
+        # パスワードの一致チェック
+        if not check_password_hash(user["password"], json["password"]):
+            return "password not match"
+        # Userクラスのクラスプロパティに値をセット
         User.id = user.key.id
-        User.email = json["email"]
-        User.password = generate_password_hash(json["password"], method='sha256')
-        User.nickname = json["nickname"]
+        User.email = user["email"]
+        User.password = user["password"]
+        User.nickname = user["nickname"]
+        logging.debug(User.id)
+        # User.email = json["email"]
+        # User.password = generate_password_hash(json["password"], method='sha256')
+        # User.nickname = json["nickname"]
+        return user
 
-        logging.debug('now leave login user')
+    def get_current_user_obj(self):
+        user = {
+            'id': User.id,
+            'email': User.email,
+            'password': User.password,
+            'nickname': User.nickname,
+        }
         return user
 
 BOOKS = [

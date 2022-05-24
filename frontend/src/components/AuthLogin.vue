@@ -24,9 +24,9 @@ const axios = require('axios').default
 export default {
   data() {
     return {
+      authUser: {},
       email: "",
       password: "",
-      nickname: "",
     }
   },
   mounted() {
@@ -43,6 +43,9 @@ export default {
       })
       .then(function (res) {
         console.log(res.data)
+        self.authUser = res.data
+        self.$emit('update-auth-notification', res.data)
+        //self.$store.commit('setAuthUser', self.authUser)  //vuexのstateで管理
         self.$router.push({name: "bookmarks-index"})
       })
       .catch(function (err){

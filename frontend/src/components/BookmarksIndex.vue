@@ -1,6 +1,8 @@
 <template>
   <div class="bookmarks-index">
-    <a href="#" @click="authLogout">ログアウト</a>
+    <p>{{authUser.email}}&nbsp;さん
+      <a href="#" @click="authLogout">ログアウト</a>
+    </p>
     <h2>ブックマーク一覧</h2>
     <router-link to="/bookmarks/create">ブックマーク登録</router-link>&nbsp;
     <router-link to="/tags">タグ一覧</router-link>&nbsp;
@@ -81,6 +83,11 @@
 const axios = require('axios').default
 
 export default {
+  props: {
+    authUser: {
+      type : Object,
+    }
+  },
   data() {
     return {
       bookmarks: [],
@@ -171,10 +178,13 @@ export default {
       return confirm("ブックマークを削除します")
     },
     authLogout: function(){
-      //let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+      let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
       axios.get('/api/auth/logout')
       .then(function (res) {
         console.log(res.data)
+        let resdate = {email: "ゲスト"}
+        self.$emit('update-auth-notification', resdate)
+        //self.$store.commit('clearAuthUser')  //vuexのstateで管理
       })
       .catch(function (err){
         console.log(err)

@@ -38,9 +38,6 @@
 export default {
   name: 'NavbarMain',
   props: {
-    account: {
-      type : Object,
-    }
   },
   data () {
     return {
@@ -53,6 +50,13 @@ export default {
   methods: {
   },
   computed: {
+    //vuexで状態管理を試みるが、リロードでstateがクリアされることが判明
+    //コンポーネント間の親子受け渡しで実装する
+    /*
+    showAuthUser () {
+      return this.$store.state.authEmail
+    }
+    */
   }
 }
 

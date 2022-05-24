@@ -20,14 +20,13 @@ bookmarks_bp = Blueprint('bookmarks', __name__, url_prefix='/api/bookmarks')
 def bookmarks():
     bookmark = Bookmark()
     if request.method == 'POST':    #POST Method
-        # ログインチェック
+        # ログインチェック デバッグ環境時、flask http://127.0.0.1:5000 で実行しないとエラーになる？
         logging.debug(current_user)
         if not current_user.is_authenticated:
             return "User is not authenticated"
-
+        # Bookmarkエンティティに登録
         json = request.get_json()
         logging.debug(json)
-        # Bookmarkエンティティに登録
         bkmark = bookmark.post_bookmark(json)
         # BookmarkTagsエンティティに登録
         bookmarkid = bkmark.key.id
