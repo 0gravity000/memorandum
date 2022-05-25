@@ -1,5 +1,8 @@
 <template>
   <div class="dom-experiment-01">
+    <p>{{authEmailOrNickname()}}&nbsp;さん
+      <a href="#" @click="authLogout">ログアウト</a>
+    </p>
     <h2>指定ページのa要素と全テキストを出力する</h2>
     <!-- 
     <form action="/api/stroke/ahref" method="post">
@@ -56,6 +59,11 @@
 const axios = require('axios').default
 
 export default {
+  props: {
+    authUser: {
+      type : Object,
+    }
+  },
   data() {
     return {
       targetUrl: "https://developer.mozilla.org/ja/docs/Web/API",
@@ -72,6 +80,25 @@ export default {
   computed: {
   },
   methods: {
+    authEmailOrNickname(){
+      if (this.authUser.nickname == "") {
+        return this.authUser.email
+      }
+      return this.authUser.nickname
+    },
+    authLogout: function(){
+      let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+      axios.get('/api/auth/logout')
+      .then(function (res) {
+        console.log(res.data)
+        let resdate = {id: "", email: "ゲスト", password: "", nickname: ""}
+        self.$emit('update-auth-notification', resdate)
+        //self.$store.commit('clearAuthUser')  //vuexのstateで管理
+      })
+      .catch(function (err){
+        console.log(err)
+      })
+    },
     crawlTargetUrl: function(){
       let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
       let uri = new URL(this.targetUrl)

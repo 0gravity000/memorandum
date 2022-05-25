@@ -26,6 +26,8 @@ def tags():
         logging.debug(json)
         # Tagエンティティに登録
         rtntag = tag.post_tag(json)
+        if not rtntag:
+            return "Already registered"
         # BookmarkTagsエンティティに登録
         # bookmark_tags.pyで実施
         tagid = rtntag.key.id
@@ -93,7 +95,8 @@ class Tag(UserMixin):
         query = client.query(kind=kind)
         result = list(query.add_filter('name', '=', json["name"]).fetch())
         if result:
-            return "Already registered"
+            logging.debug("Already registered")
+            return False
 
         # The Cloud Datastore key for the new entity
         tag_key = client.key(kind)

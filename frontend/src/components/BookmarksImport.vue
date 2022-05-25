@@ -1,5 +1,8 @@
 <template>
   <div class="bookmarks-import">
+    <p>{{authEmailOrNickname()}}&nbsp;さん
+      <a href="#" @click="authLogout">ログアウト</a>
+    </p>
     <h2>ブックマークインポート</h2>
     <p>Google Chromeのブックマークを選択してください</p>
     <label v-show="!uploadedBookmark" class="input-item_label">
@@ -46,6 +49,11 @@
 const axios = require('axios').default
 
 export default {
+  props: {
+    authUser: {
+      type : Object,
+    }
+  },
   data() {
     return {
       file_name: '',
@@ -60,6 +68,25 @@ export default {
   computed: {
   },
   methods: {
+    authEmailOrNickname(){
+      if (this.authUser.nickname == "") {
+        return this.authUser.email
+      }
+      return this.authUser.nickname
+    },
+    authLogout: function(){
+      let self = this;  //promiseコールバック関数内でthisは使えないので回避用 this.$router.push('/')
+      axios.get('/api/auth/logout')
+      .then(function (res) {
+        console.log(res.data)
+        let resdate = {id: "", email: "ゲスト", password: "", nickname: ""}
+        self.$emit('update-auth-notification', resdate)
+        //self.$store.commit('clearAuthUser')  //vuexのstateで管理
+      })
+      .catch(function (err){
+        console.log(err)
+      })
+    },
     onFileChange(e) {
       const files = e.target.files || e.dataTransfer.files
       console.log(files)
@@ -113,6 +140,7 @@ export default {
         url: element.href,
         remarks: "",
         importance: "3",
+        checkedTags: [],
       })
       .then(function (res) {
         console.log(res.data)

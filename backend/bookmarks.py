@@ -29,6 +29,8 @@ def bookmarks():
         json = request.get_json()
         logging.debug(json)
         bkmark = bookmark.post_bookmark(json)
+        if not bkmark:
+            return "Already registered"
         # BookmarkTagsエンティティに登録
         bookmarkid = bkmark.key.id
         logging.debug(bookmarkid)
@@ -137,7 +139,8 @@ class Bookmark(UserMixin):
         query = client.query(kind=kind)
         result = list(query.add_filter('url', '=', json["url"]).fetch())
         if result:
-            return "Already registered"
+            logging.debug("Already registered")
+            return False
 
         # The Cloud Datastore key for the new entity
         bookmark_key = client.key(kind)
