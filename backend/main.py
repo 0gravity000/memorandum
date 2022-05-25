@@ -157,7 +157,10 @@ def stroke_ahref():
         # logging.debug(link)
         # logging.debug(link.string)
         hrefs.append({'href': link.get('href'), 'txt': link.string})
-    allText = soup.get_text("｜")
+
+    allText = soup.get_text("｜", strip=True)
+    #allText = [text for text in soup.stripped_strings] #NG
+    #allText = soup.get_text("｜")
     # logging.debug(hrefs)
     return jsonify(hrefs, allText)
 
