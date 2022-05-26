@@ -60,6 +60,7 @@ export default {
       .then(function (res) {
         console.log(res.data)
         self.tags = res.data
+        self.$router.push({name: "tags-index"})
       })
       .catch(function (err){
         console.log(err)
