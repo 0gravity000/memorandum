@@ -34,9 +34,21 @@
     <h3 id="dom-experiment-01-result-a-tag">a要素</h3>
     <div v-for="element in elements" :key="element" class="mt-3">
       {{element.txt}}<br>
-      <a :href="targetProtocol + '//' + targetDomein + '/' + element.href" target="_blank" rel="noopener noreferrer">
-        {{targetProtocol}}//{{targetDomein}}/{{element.href}}
-      </a>
+      <div v-if="hasHrefProtocol(element.href)">
+        <a :href="element.href" target="_blank" rel="noopener noreferrer">
+          {{element.href}}
+        </a>
+      </div>
+      <div v-else>
+        <a :href="removeTargetUrlHash() + element.href" target="_blank" rel="noopener noreferrer">
+          {{removeTargetUrlHash()}}{{element.href}}
+        </a>
+        <!-- こっちでうまくいくサイトもあるので、両方表示することにする -->
+        <br>
+        <a :href="targetProtocol + '//' + targetDomein + element.href" target="_blank" rel="noopener noreferrer">
+          {{targetProtocol}}//{{targetDomein}}{{element.href}}
+        </a>
+      </div>      
     </div>
 
     <hr>
@@ -122,6 +134,26 @@ export default {
     splitEachText:  function(alltexts) {
       this.texts = alltexts.split("｜")
     },
+    hasHrefProtocol(element_href){
+      //サイトによって、a要素で取得したhrefにプロトコルとドメインが含まれていない場合があるのでチェックする
+      let re = /^\w+/g
+      let href = element_href
+      let rtn = href.match(re)
+      console.log(rtn)
+      if (rtn != null) {
+        if (!(rtn.indexOf('http')) ||!(rtn.indexOf('https')) || !(rtn.indexOf('www'))) {
+          return true
+        }
+      }
+      return false
+    },
+    removeTargetUrlHash(){
+      //検索対象のURLが#ハッシュを持っているケースがある。
+      //#ハッシュを除く
+      let array = this.targetUrl.split('#')
+      console.log(array[0])
+      return array[0] 
+    }
   },
 }
 </script>
