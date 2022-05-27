@@ -1,11 +1,11 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session
 from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 import logging
 import json
 from google.cloud import datastore
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 #from model import User, Bookmark, Tag, BookmarkUser, BookmarkTag
 from bookmarks import bookmarks_bp
 from tags import tags_bp
@@ -60,6 +60,9 @@ def auth_register():
 @app.route('/api/auth/login', methods=['POST'])
 def auth_login():
     logging.debug('now in login user')
+    # セッションのタイムアウト設定
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=60)
     user = User()
     rtnuser = user.login_user()
     # Flask-loginのログイン処理
